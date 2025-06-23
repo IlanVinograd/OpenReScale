@@ -23,7 +23,7 @@ void Logger::Init(const std::string& filename) {
         reinterpret_cast<LPCSTR>(&Logger::Init), &hm);
     GetModuleFileNameA(hm, path, MAX_PATH);
 
-    strcpy_s(strrchr(path, '\\'), MAX_PATH - strlen(path), "\\d3d9.ini");
+    strcpy_s(strrchr(path, '\\'), MAX_PATH - strlen(path), "\\d3d12.ini");
     int enableLogger = GetPrivateProfileIntA("UTILITIES", "EnableLogger", 0, path);
     if (!enableLogger) return;
 
