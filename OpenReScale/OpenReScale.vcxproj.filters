@@ -26,6 +26,9 @@
     <ClInclude Include="d3d12\logger.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="d3d12\dllmain.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="d3d12.def">

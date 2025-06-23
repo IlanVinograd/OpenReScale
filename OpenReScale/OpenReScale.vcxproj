@@ -23,6 +23,7 @@
     <ClCompile Include="d3d12\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d12\dllmain.h" />
     <ClInclude Include="d3d12\logger.h" />
   </ItemGroup>
   <ItemGroup>
