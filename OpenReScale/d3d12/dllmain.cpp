@@ -82,7 +82,7 @@ HRESULT Wrap_D3D12CreateDevice(IUnknown* pAdapter, D3D_FEATURE_LEVEL MinimumFeat
 {
     HRESULT original = S_OK;
 
-    D3D_FEATURE_LEVEL ModifiedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+    D3D_FEATURE_LEVEL ModifiedFeatureLevel = D3D_FEATURE_LEVEL_12_1;
 
     if (m_D3D12CreateDevice) Logger::LogInfo() << "D3D12CreateDevice - Address Available" << std::endl;
     else {
