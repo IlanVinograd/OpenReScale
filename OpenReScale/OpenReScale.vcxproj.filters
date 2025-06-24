@@ -21,6 +21,12 @@
     <ClCompile Include="d3d12\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="d3d12\WrappedDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12\WrappedCommandQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d12\logger.h">
@@ -31,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="d3d12\WrappedCommandQueue.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\WrappedDevice.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

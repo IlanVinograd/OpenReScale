@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include "dllmain.h"
 #include "logger.h"
+#include "WrappedDevice.h"
 
 extern "C" void call_original(void);
 extern "C" FARPROC wrapPtr = NULL;
@@ -96,7 +97,13 @@ HRESULT Wrap_D3D12CreateDevice(IUnknown* pAdapter, D3D_FEATURE_LEVEL MinimumFeat
 
     if(original >= 0x887A0000) Logger::LogError() << "Possible DXGI_ERROR code" << std::endl;
 
-    return original;
+    WrappedD3D12Device* wrapped = new WrappedD3D12Device((ID3D12Device*)*ppDevice);
+    *ppDevice = (ID3D12Device10*)wrapped;
+
+    if (FAILED(original))
+        Logger::LogError() << "D3D12CreateDevice failed with HRESULT: 0x" << std::hex << original << std::endl;
+
+    return S_OK;
 }
 
 HRESULT Wrap_D3D12CreateRootSignatureDeserializer(LPCVOID pSrcData, SIZE_T  SrcDataSizeInBytes, REFIID  pRootSignatureDeserializerInterface, void** ppRootSignatureDeserializer)

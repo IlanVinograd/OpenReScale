@@ -38,7 +38,7 @@ public:
     void STDMETHODCALLTYPE BeginEvent(UINT Metadata, const void* pData, UINT Size) override { m_real->BeginEvent(Metadata, pData, Size); }
     void STDMETHODCALLTYPE EndEvent() override { m_real->EndEvent(); }
     HRESULT STDMETHODCALLTYPE Signal(ID3D12Fence* pFence, UINT64 Value) override { return m_real->Signal(pFence, Value); }
-    HRESULT STDMETHODCALLTYPE Wait(ID3D12Fence* pFence, UINT64 Value); HRESULT STDMETHODCALLTYPE Wait(ID3D12Fence* pFence, UINT64 Value) override { return m_real->Wait(pFence, Value); }
+    HRESULT STDMETHODCALLTYPE Wait(ID3D12Fence* pFence, UINT64 Value) override { return m_real->Wait(pFence, Value); }
     HRESULT STDMETHODCALLTYPE GetTimestampFrequency(UINT64* pFrequency) override { return m_real->GetTimestampFrequency(pFrequency); }
     HRESULT STDMETHODCALLTYPE GetClockCalibration(UINT64* pGpuTimestamp, UINT64* pCpuTimestamp) override { return m_real->GetClockCalibration(pGpuTimestamp, pCpuTimestamp); }
     D3D12_COMMAND_QUEUE_DESC STDMETHODCALLTYPE GetDesc() override { return m_real->GetDesc(); }
