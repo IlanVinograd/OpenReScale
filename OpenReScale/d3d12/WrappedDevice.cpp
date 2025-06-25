@@ -1,6 +1,7 @@
 #include "WrappedDevice.h"
 #include "WrappedCommandQueue.h"
 #include "logger.h"
+#include "WrappedCommandList.h"
 
 bool RefCountD3D12Object::HandleWrap(const char* ifaceName, REFIID riid, void** ppvObject)
 {
@@ -364,7 +365,18 @@ HRESULT __stdcall WrappedD3D12Device::CreateComputePipelineState(const D3D12_COM
 
 HRESULT __stdcall WrappedD3D12Device::CreateCommandList(UINT nodeMask, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* pCommandAllocator, ID3D12PipelineState* pInitialState, REFIID riid, void** ppCommandList)
 {
-	return m_device->CreateCommandList(nodeMask, type, pCommandAllocator, pInitialState, riid, ppCommandList);
+	ID3D12GraphicsCommandList* realCmdList = nullptr;
+	HRESULT hr = m_device->CreateCommandList(
+		nodeMask, type, pCommandAllocator, pInitialState,
+		__uuidof(ID3D12GraphicsCommandList), (void**)&realCmdList);
+	if (FAILED(hr)) return hr;
+
+	WrappedCommandList* wrapped = new WrappedCommandList(realCmdList);
+
+	hr = wrapped->QueryInterface(riid, ppCommandList);
+	wrapped->Release();
+
+	return hr;
 }
 
 HRESULT __stdcall WrappedD3D12Device::CheckFeatureSupport(D3D12_FEATURE Feature, void* pFeatureSupportData, UINT FeatureSupportDataSize)

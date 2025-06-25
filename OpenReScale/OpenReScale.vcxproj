@@ -27,6 +27,7 @@
   <ItemGroup>
     <ClInclude Include="d3d12\dllmain.h" />
     <ClInclude Include="d3d12\logger.h" />
+    <ClInclude Include="d3d12\WrappedCommandList.h" />
     <ClInclude Include="d3d12\WrappedCommandQueue.h" />
     <ClInclude Include="d3d12\WrappedDevice.h" />
   </ItemGroup>

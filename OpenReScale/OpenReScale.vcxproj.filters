@@ -41,6 +41,9 @@
     <ClInclude Include="d3d12\WrappedDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="d3d12\WrappedCommandList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="d3d12.def">

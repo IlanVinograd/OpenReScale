@@ -7,21 +7,23 @@ void STDMETHODCALLTYPE WrappedCommandQueue::ExecuteCommandLists(UINT NumCommandL
 {
     Logger::LogInfo() << "ExecuteCommandLists: " << NumCommandLists << " lists submitted" << std::endl;
 
+    ID3D12GraphicsCommandList* gcl = nullptr;
+
     for (UINT i = 0; i < NumCommandLists; ++i) {
-        ID3D12GraphicsCommandList* gcl = nullptr;
         if (SUCCEEDED(ppCommandLists[i]->QueryInterface(IID_PPV_ARGS(&gcl)))) {
             Logger::LogDebug() << "Captured a graphics command list before execution" << std::endl;
-
-            gcl->Release();
+            break;
         }
     }
 
-    ID3D12Device* device = nullptr;
-    m_real->GetDevice(IID_PPV_ARGS(&device));
-    if (g_PreDLSS_RenderTarget)
-    {
+    if (g_PreDLSS_RenderTarget && gcl) {
+        ID3D12Device* device = nullptr;
+        m_real->GetDevice(IID_PPV_ARGS(&device));
+
         //SaveResourceToPng(device, gcl, g_PreDLSS_RenderTarget, L"pre_dlss.png");
     }
+
+    if (gcl) gcl->Release();
 
     m_real->ExecuteCommandLists(NumCommandLists, ppCommandLists);
 }
