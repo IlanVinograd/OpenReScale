@@ -1,29 +1,26 @@
 #include "WrappedCommandQueue.h"
+#include "WrappedCommandList.h"
 #include "logger.h"
-
-ID3D12Resource* g_PreDLSS_RenderTarget = nullptr;
 
 void STDMETHODCALLTYPE WrappedCommandQueue::ExecuteCommandLists(UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
 {
-    Logger::LogInfo() << "ExecuteCommandLists: " << NumCommandLists << " lists submitted" << std::endl;
+    std::vector<ID3D12CommandList*> realLists;
+    realLists.reserve(NumCommandLists);
 
-    ID3D12GraphicsCommandList* gcl = nullptr;
-
-    for (UINT i = 0; i < NumCommandLists; ++i) {
-        if (SUCCEEDED(ppCommandLists[i]->QueryInterface(IID_PPV_ARGS(&gcl)))) {
-            Logger::LogDebug() << "Captured a graphics command list before execution" << std::endl;
-            break;
+    for (UINT i = 0; i < NumCommandLists; ++i)
+    {
+        auto wrapped = dynamic_cast<WrappedCommandList*>(ppCommandLists[i]);
+        if (wrapped)
+        {
+            //Logger::LogInfo() << "Unwrapping WrappedCommandList at index: " << i << std::endl;
+            realLists.push_back(wrapped->GetBase());
+        }
+        else
+        {
+            //Logger::LogWarning() << "Non-wrapped CommandList at index: " << i << std::endl;
+            realLists.push_back(ppCommandLists[i]);
         }
     }
 
-    if (g_PreDLSS_RenderTarget && gcl) {
-        ID3D12Device* device = nullptr;
-        m_real->GetDevice(IID_PPV_ARGS(&device));
-
-        //SaveResourceToPng(device, gcl, g_PreDLSS_RenderTarget, L"pre_dlss.png");
-    }
-
-    if (gcl) gcl->Release();
-
-    m_real->ExecuteCommandLists(NumCommandLists, ppCommandLists);
+    m_real->ExecuteCommandLists(NumCommandLists, realLists.data());
 }

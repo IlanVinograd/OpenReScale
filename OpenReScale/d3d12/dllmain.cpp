@@ -144,7 +144,7 @@ HRESULT Wrap_D3D12SerializeRootSignature(const D3D12_ROOT_SIGNATURE_DESC* pRootS
 
 HRESULT Wrap_D3D12SerializeVersionedRootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC* pRootSignature, ID3DBlob** ppBlob, ID3DBlob** ppErrorBlob)
 {
-    Logger::LogInfo() << "Wrap_D3D12SerializeVersionedRootSignature" << std::endl;
+    //Logger::LogInfo() << "Wrap_D3D12SerializeVersionedRootSignature" << std::endl;
     return ((PFN_D3D12SerializeVersionedRootSignature)m_D3D12SerializeVersionedRootSignature)(pRootSignature, ppBlob, ppErrorBlob);
 }
 

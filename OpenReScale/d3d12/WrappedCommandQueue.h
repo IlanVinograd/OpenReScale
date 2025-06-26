@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d12.h>
+#include "logger.h"
 
 class WrappedCommandQueue : public ID3D12CommandQueue {
 public:

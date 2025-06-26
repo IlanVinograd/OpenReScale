@@ -363,20 +363,18 @@ HRESULT __stdcall WrappedD3D12Device::CreateComputePipelineState(const D3D12_COM
 	return m_device->CreateComputePipelineState(pDesc, riid, ppPipelineState);
 }
 
-HRESULT __stdcall WrappedD3D12Device::CreateCommandList(UINT nodeMask, D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator* pCommandAllocator, ID3D12PipelineState* pInitialState, REFIID riid, void** ppCommandList)
+HRESULT __stdcall WrappedD3D12Device::CreateCommandList(UINT nodeMask, D3D12_COMMAND_LIST_TYPE type,
+	ID3D12CommandAllocator* pCommandAllocator, ID3D12PipelineState* pInitialState,
+	REFIID riid, void** ppCommandList)
 {
 	ID3D12GraphicsCommandList* realCmdList = nullptr;
-	HRESULT hr = m_device->CreateCommandList(
-		nodeMask, type, pCommandAllocator, pInitialState,
+	HRESULT hr = m_device->CreateCommandList(nodeMask, type, pCommandAllocator, pInitialState,
 		__uuidof(ID3D12GraphicsCommandList), (void**)&realCmdList);
 	if (FAILED(hr)) return hr;
 
-	WrappedCommandList* wrapped = new WrappedCommandList(realCmdList);
-
-	hr = wrapped->QueryInterface(riid, ppCommandList);
-	wrapped->Release();
-
-	return hr;
+	auto wrapped = new WrappedCommandList(realCmdList);
+	*ppCommandList = (ID3D12GraphicsCommandList*)wrapped;
+	return S_OK;
 }
 
 HRESULT __stdcall WrappedD3D12Device::CheckFeatureSupport(D3D12_FEATURE Feature, void* pFeatureSupportData, UINT FeatureSupportDataSize)

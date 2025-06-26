@@ -1,5 +1,9 @@
 #pragma once
 #include <d3d12.h>
+#include "logger.h"
+
+extern D3D12_VERTEX_BUFFER_VIEW lastVBView;
+extern D3D12_INDEX_BUFFER_VIEW lastIBView;
 
 class WrappedCommandList : public ID3D12GraphicsCommandList {
 public:
@@ -16,12 +20,8 @@ public:
     HRESULT STDMETHODCALLTYPE Reset(ID3D12CommandAllocator* pAllocator, ID3D12PipelineState* pInitialState) override {
         return m_real->Reset(pAllocator, pInitialState);
     }
-    void STDMETHODCALLTYPE DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) override {
-        m_real->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
-    }
-    void STDMETHODCALLTYPE DrawIndexedInstanced(UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) override {
-        m_real->DrawIndexedInstanced(IndexCountPerInstance, InstanceCount, StartIndexLocation, BaseVertexLocation, StartInstanceLocation);
-    }
+    void STDMETHODCALLTYPE DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) override;
+    void STDMETHODCALLTYPE DrawIndexedInstanced(UINT IndexCountPerInstance, UINT InstanceCount, UINT StartIndexLocation, INT BaseVertexLocation, UINT StartInstanceLocation) override;
     void STDMETHODCALLTYPE Dispatch(UINT ThreadGroupCountX, UINT ThreadGroupCountY, UINT ThreadGroupCountZ) override {
         m_real->Dispatch(ThreadGroupCountX, ThreadGroupCountY, ThreadGroupCountZ);
     }
@@ -127,12 +127,8 @@ public:
     void STDMETHODCALLTYPE SetGraphicsRootUnorderedAccessView(UINT RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation) override {
         m_real->SetGraphicsRootUnorderedAccessView(RootParameterIndex, BufferLocation);
     }
-    void STDMETHODCALLTYPE IASetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* pView) override {
-        m_real->IASetIndexBuffer(pView);
-    }
-    void STDMETHODCALLTYPE IASetVertexBuffers(UINT StartSlot, UINT NumViews, const D3D12_VERTEX_BUFFER_VIEW* pViews) override {
-        m_real->IASetVertexBuffers(StartSlot, NumViews, pViews);
-    }
+    void STDMETHODCALLTYPE IASetIndexBuffer(const D3D12_INDEX_BUFFER_VIEW* pView) override;
+    void STDMETHODCALLTYPE IASetVertexBuffers(UINT StartSlot, UINT NumViews, const D3D12_VERTEX_BUFFER_VIEW* pViews) override;
     void STDMETHODCALLTYPE SOSetTargets(UINT StartSlot, UINT NumViews, const D3D12_STREAM_OUTPUT_BUFFER_VIEW* pViews) override {
         m_real->SOSetTargets(StartSlot, NumViews, pViews);
     }
@@ -216,6 +212,7 @@ public:
         m_real->ClearState(pPipelineState);
     }
 
+    ID3D12CommandList* GetBase() const { return m_real; }
 private:
     ID3D12GraphicsCommandList* m_real;
 };

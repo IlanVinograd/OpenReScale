@@ -27,6 +27,9 @@
     <ClCompile Include="d3d12\WrappedCommandQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="d3d12\WrappedCommandList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d12\logger.h">
