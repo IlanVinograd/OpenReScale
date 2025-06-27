@@ -30,6 +30,9 @@
     <ClCompile Include="d3d12\WrappedCommandList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="d3d12\ObjectExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d12\logger.h">
@@ -46,6 +49,12 @@
     </ClInclude>
     <ClInclude Include="d3d12\WrappedCommandList.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\d3dx12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\ObjectExporter.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

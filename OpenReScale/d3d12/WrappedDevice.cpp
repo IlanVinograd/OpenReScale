@@ -2,6 +2,7 @@
 #include "WrappedCommandQueue.h"
 #include "logger.h"
 #include "WrappedCommandList.h"
+#include "d3dx12.h"
 
 bool RefCountD3D12Object::HandleWrap(const char* ifaceName, REFIID riid, void** ppvObject)
 {
@@ -447,29 +448,75 @@ D3D12_HEAP_PROPERTIES __stdcall WrappedD3D12Device::GetCustomHeapProperties(UINT
 	return m_device->GetCustomHeapProperties(nodeMask, heapType);
 }
 
-HRESULT __stdcall WrappedD3D12Device::CreateCommittedResource(const D3D12_HEAP_PROPERTIES* pHeapProperties, D3D12_HEAP_FLAGS HeapFlags, const D3D12_RESOURCE_DESC* pDesc, D3D12_RESOURCE_STATES InitialResourceState, const D3D12_CLEAR_VALUE* pOptimizedClearValue, REFIID riidResource, void** ppvResource)
+HRESULT __stdcall WrappedD3D12Device::CreateCommittedResource(
+	const D3D12_HEAP_PROPERTIES* pHeapProperties,
+	D3D12_HEAP_FLAGS HeapFlags,
+	const D3D12_RESOURCE_DESC* pDesc,
+	D3D12_RESOURCE_STATES InitialResourceState,
+	const D3D12_CLEAR_VALUE* pOptimizedClearValue,
+	REFIID riidResource,
+	void** ppvResource)
 {
+	if (!ppvResource) {
+		Logger::LogError() << "[CreateCommittedResource] ppvResource is NULL!";
+		return E_POINTER;
+	}
+
+	*ppvResource = nullptr;
+
 	HRESULT hr = m_device->CreateCommittedResource(
 		pHeapProperties, HeapFlags, pDesc, InitialResourceState,
 		pOptimizedClearValue, riidResource, ppvResource);
 
-	if (SUCCEEDED(hr) && ppvResource && pDesc->Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) {
-		ID3D12Resource* res = static_cast<ID3D12Resource*>(*ppvResource);
-		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = res->GetGPUVirtualAddress();
+	if (FAILED(hr)) {
+		Logger::LogError() << "[CreateCommittedResource] Call failed with HRESULT: 0x"
+			<< std::hex << hr;
+		return hr;
+	}
 
-		ResourceRange entry = {
-			.base = gpuAddr,
-			.size = pDesc->Width,
-			.resource = res
-		};
-		g_Resources.push_back(entry);
+	if (!*ppvResource) {
+		Logger::LogError() << "[CreateCommittedResource] Resource was not created (nullptr)!";
+		return E_FAIL;
+	}
 
-		Logger::LogInfo() << "[CreateCommittedResource] Added resource @ 0x" << std::hex << gpuAddr << " size: " << std::dec << pDesc->Width;
+	if (pDesc && pDesc->Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+	{
+		IUnknown* unk = reinterpret_cast<IUnknown*>(*ppvResource);
+
+		if (!unk) {
+			Logger::LogError() << "[CreateCommittedResource] reinterpret_cast to IUnknown failed!";
+			return hr;
+		}
+
+		ID3D12Resource* res = nullptr;
+		HRESULT qhr = unk->QueryInterface(IID_PPV_ARGS(&res));
+		if (FAILED(qhr)) {
+			Logger::LogWarning() << "[CreateCommittedResource] QueryInterface(ID3D12Resource) failed, HRESULT: 0x"
+				<< std::hex << qhr;
+			return hr;
+		}
+
+		if (res)
+		{
+			D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = res->GetGPUVirtualAddress();
+
+			ResourceRange entry = {
+				.base = gpuAddr,
+				.size = static_cast<UINT>(pDesc->Width),
+				.resource = res
+			};
+
+			g_Resources.push_back(entry);
+
+			Logger::LogInfo() << "[CreateCommittedResource] Added resource @ 0x"
+				<< std::hex << gpuAddr
+				<< " size: " << std::dec << pDesc->Width;
+
+			res->Release();
+		}
 	}
 
 	return hr;
-
-	//return m_device->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
 }
 
 HRESULT __stdcall WrappedD3D12Device::CreateHeap(const D3D12_HEAP_DESC* pDesc, REFIID riid, void** ppvHeap)

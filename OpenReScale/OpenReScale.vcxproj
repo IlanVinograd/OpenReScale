@@ -21,13 +21,16 @@
   <ItemGroup>
     <ClCompile Include="d3d12\dllmain.cpp" />
     <ClCompile Include="d3d12\Logger.cpp" />
+    <ClCompile Include="d3d12\ObjectExporter.cpp" />
     <ClCompile Include="d3d12\WrappedCommandList.cpp" />
     <ClCompile Include="d3d12\WrappedCommandQueue.cpp" />
     <ClCompile Include="d3d12\WrappedDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d12\d3dx12.h" />
     <ClInclude Include="d3d12\dllmain.h" />
     <ClInclude Include="d3d12\logger.h" />
+    <ClInclude Include="d3d12\ObjectExporter.h" />
     <ClInclude Include="d3d12\WrappedCommandList.h" />
     <ClInclude Include="d3d12\WrappedCommandQueue.h" />
     <ClInclude Include="d3d12\WrappedDevice.h" />
