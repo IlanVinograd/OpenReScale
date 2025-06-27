@@ -41,6 +41,12 @@
   <ItemGroup>
     <MASM Include="d3d12\call_original.asm" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="d3d12.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="d3d12\call_original.asm" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

@@ -30,6 +30,32 @@ FARPROC m_D3D12SerializeRootSignature;
 FARPROC m_D3D12SerializeVersionedRootSignature;
 FARPROC m_GetBehaviorValue;
 
+extern "C" void call_original(void);
+extern "C" FARPROC wrapPtr = NULL;
+
+static HMODULE d3d12dll = nullptr;
+
+PFN_D3D12CreateDevice m_D3D12CreateDevice;
+
+FARPROC m_SetAppCompatStringPointer;
+//FARPROC m_D3D12CreateDevice;
+FARPROC m_D3D12GetDebugInterface;
+FARPROC m_D3D12CoreCreateLayeredDevice;
+FARPROC m_D3D12CoreGetLayeredDeviceSize;
+FARPROC m_D3D12CoreRegisterLayers;
+FARPROC m_D3D12CreateRootSignatureDeserializer;
+FARPROC m_D3D12CreateVersionedRootSignatureDeserializer;
+FARPROC m_D3D12DeviceRemovedExtendedData;
+FARPROC m_D3D12EnableExperimentalFeatures;
+FARPROC m_D3D12GetInterface;
+FARPROC m_D3D12PIXEventsReplaceBlock;
+FARPROC m_D3D12PIXGetThreadInfo;
+FARPROC m_D3D12PIXNotifyWakeFromFenceSignal;
+FARPROC m_D3D12PIXReportCounter;
+FARPROC m_D3D12SerializeRootSignature;
+FARPROC m_D3D12SerializeVersionedRootSignature;
+FARPROC m_GetBehaviorValue;
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
     switch (ul_reason_for_call)
@@ -145,6 +171,7 @@ HRESULT Wrap_D3D12SerializeRootSignature(const D3D12_ROOT_SIGNATURE_DESC* pRootS
 HRESULT Wrap_D3D12SerializeVersionedRootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC* pRootSignature, ID3DBlob** ppBlob, ID3DBlob** ppErrorBlob)
 {
     //Logger::LogInfo() << "Wrap_D3D12SerializeVersionedRootSignature" << std::endl;
+
     return ((PFN_D3D12SerializeVersionedRootSignature)m_D3D12SerializeVersionedRootSignature)(pRootSignature, ppBlob, ppErrorBlob);
 }
 
