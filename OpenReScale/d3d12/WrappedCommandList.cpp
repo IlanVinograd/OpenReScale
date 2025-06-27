@@ -9,13 +9,12 @@ D3D12_INDEX_BUFFER_VIEW lastIBView = {};
 std::vector<ResourceRange> g_Resources;
 
 static bool wasPressed = false;
+static std::unordered_set<size_t> g_exportedHashes;
 
 void STDMETHODCALLTYPE WrappedCommandList::DrawInstanced(UINT VertexCountPerInstance, UINT InstanceCount, UINT StartVertexLocation, UINT StartInstanceLocation) {
     //Logger::LogInfo() << "DrawInstanced: " << InstanceCount << std::endl;
     m_real->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
 }
-
-#include <chrono> // добавить в начало файла, если ещё нет
 
 void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
     UINT IndexCountPerInstance,
@@ -27,7 +26,7 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
     static bool g_deviceLost = false;
     static bool wasPressed = false;
     static std::chrono::steady_clock::time_point lastSaveTime = std::chrono::steady_clock::now();
-    const std::chrono::milliseconds kMinInterval(500); // минимальный интервал между сохранениями
+    const std::chrono::milliseconds kMinInterval(400);
 
     if (g_deviceLost)
     {
@@ -92,10 +91,14 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
         UINT vbSize = lastVBView.SizeInBytes;
         UINT ibSize = lastIBView.SizeInBytes;
 
-        const UINT64 kMaxBufferSize = 64ull * 1024 * 1024;
-        if (vbSize > kMaxBufferSize || ibSize > kMaxBufferSize)
+        if (vbSize < kMinSaveSize || ibSize < kMinSaveSize)
         {
-            Logger::LogWarning() << "[DrawIndexedInstanced] Buffer size too large.";
+            Logger::LogInfo() << "[DrawIndexedInstanced] Skipped: buffer too small.";
+            goto CleanupAndDraw;
+        }
+        if (vbSize > kMaxSaveSize || ibSize > kMaxSaveSize)
+        {
+            Logger::LogWarning() << "[DrawIndexedInstanced] Skipped: buffer too large.";
             goto CleanupAndDraw;
         }
 
@@ -204,8 +207,17 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
             if (SUCCEEDED(vbReadback->Map(0, nullptr, &vbData)) &&
                 SUCCEEDED(ibReadback->Map(0, nullptr, &ibData)))
             {
-                Logger::LogInfo() << "[DrawIndexedInstanced] Readback success. vb=" << vbData << ", ib=" << ibData;
-                RunAsyncExport(vbData, vbSize, lastVBView.StrideInBytes, ibData, ibSize, lastIBView.Format);
+                size_t hash = HashBuffers(vbData, vbSize, ibData, ibSize);
+                if (g_exportedHashes.find(hash) != g_exportedHashes.end())
+                {
+                    Logger::LogInfo() << "[DrawIndexedInstanced] Skipped duplicate mesh.";
+                }
+                else
+                {
+                    Logger::LogInfo() << "[DrawIndexedInstanced] Readback success. vb=" << vbData << ", ib=" << ibData;
+                    g_exportedHashes.insert(hash);
+                    RunAsyncExport(vbData, vbSize, lastVBView.StrideInBytes, ibData, ibSize, lastIBView.Format);
+                }
                 vbReadback->Unmap(0, nullptr);
                 ibReadback->Unmap(0, nullptr);
             }
