@@ -449,7 +449,27 @@ D3D12_HEAP_PROPERTIES __stdcall WrappedD3D12Device::GetCustomHeapProperties(UINT
 
 HRESULT __stdcall WrappedD3D12Device::CreateCommittedResource(const D3D12_HEAP_PROPERTIES* pHeapProperties, D3D12_HEAP_FLAGS HeapFlags, const D3D12_RESOURCE_DESC* pDesc, D3D12_RESOURCE_STATES InitialResourceState, const D3D12_CLEAR_VALUE* pOptimizedClearValue, REFIID riidResource, void** ppvResource)
 {
-	return m_device->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
+	HRESULT hr = m_device->CreateCommittedResource(
+		pHeapProperties, HeapFlags, pDesc, InitialResourceState,
+		pOptimizedClearValue, riidResource, ppvResource);
+
+	if (SUCCEEDED(hr) && ppvResource && pDesc->Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) {
+		ID3D12Resource* res = static_cast<ID3D12Resource*>(*ppvResource);
+		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = res->GetGPUVirtualAddress();
+
+		ResourceRange entry = {
+			.base = gpuAddr,
+			.size = pDesc->Width,
+			.resource = res
+		};
+		g_Resources.push_back(entry);
+
+		Logger::LogInfo() << "[CreateCommittedResource] Added resource @ 0x" << std::hex << gpuAddr << " size: " << std::dec << pDesc->Width;
+	}
+
+	return hr;
+
+	//return m_device->CreateCommittedResource(pHeapProperties, HeapFlags, pDesc, InitialResourceState, pOptimizedClearValue, riidResource, ppvResource);
 }
 
 HRESULT __stdcall WrappedD3D12Device::CreateHeap(const D3D12_HEAP_DESC* pDesc, REFIID riid, void** ppvHeap)

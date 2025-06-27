@@ -2,8 +2,15 @@
 #include <d3d12.h>
 #include "logger.h"
 
+struct ResourceRange {
+    D3D12_GPU_VIRTUAL_ADDRESS base;
+    UINT64 size;
+    ID3D12Resource* resource;
+};
+
 extern D3D12_VERTEX_BUFFER_VIEW lastVBView;
 extern D3D12_INDEX_BUFFER_VIEW lastIBView;
+extern std::vector<ResourceRange> g_Resources;
 
 class WrappedCommandList : public ID3D12GraphicsCommandList {
 public:
@@ -118,9 +125,8 @@ public:
     void STDMETHODCALLTYPE SetComputeRootShaderResourceView(UINT RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation) override {
         m_real->SetComputeRootShaderResourceView(RootParameterIndex, BufferLocation);
     }
-    void STDMETHODCALLTYPE SetGraphicsRootShaderResourceView(UINT RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation) override {
-        m_real->SetGraphicsRootShaderResourceView(RootParameterIndex, BufferLocation);
-    }
+    void STDMETHODCALLTYPE SetGraphicsRootShaderResourceView(UINT RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation) override;
+
     void STDMETHODCALLTYPE SetComputeRootUnorderedAccessView(UINT RootParameterIndex, D3D12_GPU_VIRTUAL_ADDRESS BufferLocation) override {
         m_real->SetComputeRootUnorderedAccessView(RootParameterIndex, BufferLocation);
     }
