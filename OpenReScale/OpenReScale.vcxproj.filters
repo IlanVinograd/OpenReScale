@@ -21,12 +21,39 @@
     <ClCompile Include="d3d12\Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="d3d12\WrappedDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12\WrappedCommandQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12\WrappedCommandList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3d12\ObjectExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d12\logger.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="d3d12\dllmain.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\WrappedCommandQueue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\WrappedDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\WrappedCommandList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\d3dx12.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d12\ObjectExporter.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

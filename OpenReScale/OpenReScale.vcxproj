@@ -21,10 +21,25 @@
   <ItemGroup>
     <ClCompile Include="d3d12\dllmain.cpp" />
     <ClCompile Include="d3d12\Logger.cpp" />
+    <ClCompile Include="d3d12\ObjectExporter.cpp" />
+    <ClCompile Include="d3d12\WrappedCommandList.cpp" />
+    <ClCompile Include="d3d12\WrappedCommandQueue.cpp" />
+    <ClCompile Include="d3d12\WrappedDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="d3d12\d3dx12.h" />
     <ClInclude Include="d3d12\dllmain.h" />
     <ClInclude Include="d3d12\logger.h" />
+    <ClInclude Include="d3d12\ObjectExporter.h" />
+    <ClInclude Include="d3d12\WrappedCommandList.h" />
+    <ClInclude Include="d3d12\WrappedCommandQueue.h" />
+    <ClInclude Include="d3d12\WrappedDevice.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="d3d12.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="d3d12\call_original.asm" />
   </ItemGroup>
   <ItemGroup>
     <None Include="d3d12.def" />
@@ -105,7 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -126,7 +141,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -144,7 +159,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -165,7 +180,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>

@@ -2,6 +2,33 @@
 #include <d3d12.h>
 #include "dllmain.h"
 #include "logger.h"
+#include "WrappedDevice.h"
+
+extern "C" void call_original(void);
+extern "C" FARPROC wrapPtr = NULL;
+
+static HMODULE d3d12dll = nullptr;
+
+PFN_D3D12CreateDevice m_D3D12CreateDevice;
+
+FARPROC m_SetAppCompatStringPointer;
+//FARPROC m_D3D12CreateDevice;
+FARPROC m_D3D12GetDebugInterface;
+FARPROC m_D3D12CoreCreateLayeredDevice;
+FARPROC m_D3D12CoreGetLayeredDeviceSize;
+FARPROC m_D3D12CoreRegisterLayers;
+FARPROC m_D3D12CreateRootSignatureDeserializer;
+FARPROC m_D3D12CreateVersionedRootSignatureDeserializer;
+FARPROC m_D3D12DeviceRemovedExtendedData;
+FARPROC m_D3D12EnableExperimentalFeatures;
+FARPROC m_D3D12GetInterface;
+FARPROC m_D3D12PIXEventsReplaceBlock;
+FARPROC m_D3D12PIXGetThreadInfo;
+FARPROC m_D3D12PIXNotifyWakeFromFenceSignal;
+FARPROC m_D3D12PIXReportCounter;
+FARPROC m_D3D12SerializeRootSignature;
+FARPROC m_D3D12SerializeVersionedRootSignature;
+FARPROC m_GetBehaviorValue;
 
 extern "C" void call_original(void);
 extern "C" FARPROC wrapPtr = NULL;
@@ -82,7 +109,7 @@ HRESULT Wrap_D3D12CreateDevice(IUnknown* pAdapter, D3D_FEATURE_LEVEL MinimumFeat
 {
     HRESULT original = S_OK;
 
-    D3D_FEATURE_LEVEL ModifiedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+    D3D_FEATURE_LEVEL ModifiedFeatureLevel = D3D_FEATURE_LEVEL_12_1;
 
     if (m_D3D12CreateDevice) Logger::LogInfo() << "D3D12CreateDevice - Address Available" << std::endl;
     else {
@@ -96,7 +123,13 @@ HRESULT Wrap_D3D12CreateDevice(IUnknown* pAdapter, D3D_FEATURE_LEVEL MinimumFeat
 
     if(original >= 0x887A0000) Logger::LogError() << "Possible DXGI_ERROR code" << std::endl;
 
-    return original;
+    WrappedD3D12Device* wrapped = new WrappedD3D12Device((ID3D12Device*)*ppDevice);
+    *ppDevice = (ID3D12Device10*)wrapped;
+
+    if (FAILED(original))
+        Logger::LogError() << "D3D12CreateDevice failed with HRESULT: 0x" << std::hex << original << std::endl;
+
+    return S_OK;
 }
 
 HRESULT Wrap_D3D12CreateRootSignatureDeserializer(LPCVOID pSrcData, SIZE_T  SrcDataSizeInBytes, REFIID  pRootSignatureDeserializerInterface, void** ppRootSignatureDeserializer)
@@ -137,7 +170,8 @@ HRESULT Wrap_D3D12SerializeRootSignature(const D3D12_ROOT_SIGNATURE_DESC* pRootS
 
 HRESULT Wrap_D3D12SerializeVersionedRootSignature(const D3D12_VERSIONED_ROOT_SIGNATURE_DESC* pRootSignature, ID3DBlob** ppBlob, ID3DBlob** ppErrorBlob)
 {
-    Logger::LogInfo() << "Wrap_D3D12SerializeVersionedRootSignature" << std::endl;
+    //Logger::LogInfo() << "Wrap_D3D12SerializeVersionedRootSignature" << std::endl;
+
     return ((PFN_D3D12SerializeVersionedRootSignature)m_D3D12SerializeVersionedRootSignature)(pRootSignature, ppBlob, ppErrorBlob);
 }
 
