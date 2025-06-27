@@ -2,6 +2,7 @@
 #include "WrappedDevice.h"
 #include "ObjectExporter.h"
 #include "d3dx12.h"
+#include <chrono>
 
 D3D12_VERTEX_BUFFER_VIEW lastVBView = {};
 D3D12_INDEX_BUFFER_VIEW lastIBView = {};
@@ -14,6 +15,8 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawInstanced(UINT VertexCountPerInst
     m_real->DrawInstanced(VertexCountPerInstance, InstanceCount, StartVertexLocation, StartInstanceLocation);
 }
 
+#include <chrono> // добавить в начало файла, если ещё нет
+
 void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
     UINT IndexCountPerInstance,
     UINT InstanceCount,
@@ -23,6 +26,8 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
 {
     static bool g_deviceLost = false;
     static bool wasPressed = false;
+    static std::chrono::steady_clock::time_point lastSaveTime = std::chrono::steady_clock::now();
+    const std::chrono::milliseconds kMinInterval(500); // минимальный интервал между сохранениями
 
     if (g_deviceLost)
     {
@@ -68,8 +73,14 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
     SHORT keyState = GetAsyncKeyState('N');
     bool isPressed = (keyState & 0x8000) != 0;
 
-    if (isPressed && !wasPressed)
+    if (isPressed)
     {
+        auto now = std::chrono::steady_clock::now();
+        if (now - lastSaveTime < kMinInterval)
+            goto CleanupAndDraw;
+
+        lastSaveTime = now;
+
         if (!vbResource || !ibResource)
         {
             Logger::LogWarning() << "[DrawIndexedInstanced] Buffers not found.";
@@ -88,7 +99,6 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
             goto CleanupAndDraw;
         }
 
-        // Проверка границ GPU ресурсов
         auto vbDesc = vbResource->GetDesc();
         auto ibDesc = ibResource->GetDesc();
         if (vbOffset + vbSize > vbDesc.Width || ibOffset + ibSize > ibDesc.Width)
@@ -97,7 +107,6 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
             goto CleanupAndDraw;
         }
 
-        // --- GPU Readback ---
         ID3D12Resource* vbReadback = nullptr;
         ID3D12Resource* ibReadback = nullptr;
         ID3D12CommandAllocator* allocator = nullptr;
@@ -105,7 +114,6 @@ void STDMETHODCALLTYPE WrappedCommandList::DrawIndexedInstanced(
         ID3D12CommandQueue* queue = nullptr;
         ID3D12Fence* fence = nullptr;
         HANDLE fenceEvent = nullptr;
-
         bool success = true;
 
         CD3DX12_HEAP_PROPERTIES readbackHeap(D3D12_HEAP_TYPE_READBACK);
